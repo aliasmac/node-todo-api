@@ -23,6 +23,8 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, client) => {
     //     console.log('Unable to fetch todos', err)
     // })
 
+    // can also do find.({completed: false}).tArray....
+
 
     // db.collection('Todos').find({
     //     _id: new ObjectID("5be3203af3eb428fc495a9d5") 
