@@ -14,6 +14,7 @@ const port = process.env.PORT || 3000
 
 app.use(bodyParser.json())
 
+// (CREATE) POST NEW RESOURCE
 app.post('/todos', (req, res) => {
     var todo = new Todo({
         text: req.body.text
@@ -25,6 +26,7 @@ app.post('/todos', (req, res) => {
     })
 })
 
+// GET ALL TODOS (INDEX)
 app.get('/todos', (req, res) => {
     Todo.find().then((todos) => {
         res.send({
@@ -35,6 +37,7 @@ app.get('/todos', (req, res) => {
     })
 })
 
+// GET SINGLE RESOURCE (SHOW)
 app.get('/todos/:id', (req, res) => {
     var id = req.params.id
 
@@ -50,7 +53,24 @@ app.get('/todos/:id', (req, res) => {
     }).catch((e) => {
         res.status(400).send({})
     })
+})
 
+// DELETE
+app.delete('/todos/:id', (req, res) => {
+    var id = req.params.id
+
+    if (!ObjectID.isValid(id)) {
+        res.status(404).send()
+    }
+
+    Todo.findByIdAndRemove(id).then((todo) => {
+        if (!todo) {
+            return res.status(404).send()
+        }
+        res.send({ todo })
+    }).catch((e) => {
+        res.status(400).send({})
+    })
 
 })
 
