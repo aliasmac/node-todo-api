@@ -1,5 +1,8 @@
-var express = require('express')
-var bodyParser = require('body-parser')
+// Lodash is bascially a library with lots of realy cool methods,
+// particularlry useful for patch route
+const _ = require('lodash')
+const express = require('express')
+const bodyParser = require('body-parser')
 const {ObjectID} = require('mongodb')
 
 // importing all local dependencies 
@@ -74,13 +77,46 @@ app.delete('/todos/:id', (req, res) => {
 
 })
 
+// PATCH/UPDATE
+app.patch('/todos/:id', (req, res) => {
+    var id = req.params.id 
+    // pick pulls of properties if they exist, in this case if present 
+    // in the body of the request so that only what we want to allow to 
+    // update gets updated
+    var body = _.pick(req.body, ['text', 'completed'])
+
+    if (!ObjectID.isValid(id)) {
+        res.status(404).send()
+    }
+
+    // Code to set the completedAt value
+    if (_.isBoolean(body.completed) && body.completed ) {
+        body.completedAt = new Date().getTime()
+    } else {
+        body.completed = false
+        body.completedAt = null
+    }
+
+    Todo.findByIdAndUpdate(id, { $set: body }, { new: true })
+        .then((todo) => {
+            if (!todo) {
+                return res.status(404).send()
+            }
+            res.send({ todo })
+        }).catch((e) => {
+            res.status(400).send()
+        })
+
+})
+
+
 
 app.listen(port, () => {
     console.log(`Started up at port ${port}`)
 })
 
 
-module.exports = {app}
+module.exports = { app }
 
 
 
